@@ -15,18 +15,34 @@
 <body>
     <div class="container">
         <div class="row justify-content-center">
-            <div class="col-12 col-md-8 col-lg-6">
+            <div class="col-12 col-md-10 col-lg-8">
                 <h1>할 일 목록</h1>
                 <hr>
-                <form action="./create" method="post">
+                <form action="{% url 'todo:todo' %}" method="post" class="row g-3">
                     {% csrf_token %}
-                    <div class="input-group mb-3">
-                        <label for="todo" class="input-group-text">할 일</label>
-                        <input type="text" name="title" class="form-control" id="todo" 
-                            placeholder="할 일을 입력해주세요."
-                            autofocus
-                        >
-                        <button type="submit" class="btn btn-outline-primary">등록</button>
+                    
+                    <div class="col-md-6">
+                        <label for="id_title" class="form-label">할 일 제목</label>
+                        <input type="text" name="title" class="form-control {% if form.title.errors %}is-invalid{% endif %}" id="id_title"
+                            value="{{ form.title.value|default_if_none:'' }}"
+                            placeholder="할 일을 입력해주세요.">
+                        {% for error in form.title.errors %}
+                        <div class="invalid-feedback">{{ error }}</div>
+                        {% endfor %}
+                    </div>
+
+                    <div class="col-md-6">
+                        <label for="id_content" class="form-label">내용</label>
+                        <input type="text" name="content" class="form-control {% if form.content.errors %}is-invalid{% endif %}" id="id_content"
+                            value="{{ form.content.value|default_if_none:'' }}"
+                            placeholder="내용을 입력해주세요.">
+                        {% for error in form.content.errors %}
+                        <div class="invalid-feedback">{{ error }}</div>
+                        {% endfor %}
+                    </div>
+
+                    <div class="col-12">
+                        <button type="submit" class="btn btn-primary">등록</button>
                     </div>
                 </form>
                 <hr>
@@ -34,40 +50,48 @@
                 <table class="table table-bordered text-center align-middle">
                     <thead>
                         <tr class="table-dark">
-                            <th>✅</th>
+                            <th>🚀</th>
                             <th class="text-start">할 일</th>
-                            <th>⭐</th>
+                            <th>내용</th>
+                            <th>🕹</th>
                         </tr>
                     </thead>
                     <tbody>
                         
                         {% for todo in ing_list %}
-                            <tr {% if todo.status == 'DONE' %}class="table-success"{% endif %}>
+                            <tr {% if todo.status == 'DONE' %}class="table-success text-decoration-line-through"{% endif %}
+                                {% if todo.status == 'ING' %} class="table-info fw-bolder"{% endif %}
+                                onclick="detail('{{ todo.no }}')" 
+                                style="cursor: pointer;">
                                 <td>
-                                    <form action="./done" method="post">
+                                    <form action="{% url 'todo:done' %}" method="post">
                                         {% csrf_token %}
                                         <input type="hidden" name="no" value="{{ todo.no }}">
-                                        <input type="checkbox" class="form-check-input" 
+                                        <input type="checkbox" class="form-check-input"
                                                 onchange="this.form.submit()"
-                                                {% if todo.status == 'DONE' %}checked{% endif %}>
+                                                {% if todo.status == 'DONE' %}checked{% endif %}
+                                                style="width: 30px; height: 30px;">
                                     </form>
                                 </td>
-                                <td class="text-start">
+                                <td class="text-start w-25">
                                     {{ todo.title }}
+                                </td>
+                                <td class="text-start w-75">
+                                    {{ todo.content }}
                                 </td>
                                 <td>
                                     <div class="d-flex justify-content-center gap-2">
-                                        <form action="./wait" method="post">
-                                            {% csrf_token %}
-                                            <input type="hidden" name="no" value="{{ todo.no }}">
-                                            <button class="btn btn-success">
-                                                <i class="bi bi-arrow-down-square"></i>
-                                            </button>
-                                        </form>
-                                        <form action="./delete" method="post">
+                                        <form action="{% url 'todo:wait' %}" method="post">
                                             {% csrf_token %}
                                             <input type="hidden" name="no" value="{{ todo.no }}">
                                             <button class="btn btn-danger">
+                                                <i class="bi bi-arrow-down-square"></i>
+                                            </button>
+                                        </form>
+                                        <form action="{% url 'todo:delete' todo.no %}" method="post">
+                                            {% csrf_token %}
+                                            <input type="hidden" name="todo_no" value="{{ todo.no }}">
+                                            <button class="btn btn-dark">
                                                 <i class="bi bi-trash2"></i>
                                             </button>
                                         </form>
@@ -88,35 +112,39 @@
                 <table class="table table-bordered text-center align-middle">
                     <thead>
                         <tr class="table-dark">
-                            <th>✅</th>
-                            <th class="text-start">할 일</th>
-                            <th>⭐</th>
+                            <th>할 일</th>
+                            <th class="text-start">내용</th>
+                            <th>🕹</th>
                         </tr>
                     </thead>
                     <tbody>
                         
                         {% for todo in wait_list %}
-                            <tr>
-                                <td>
-                                    <form action="./ing" method="post">
-                                      {% csrf_token %} 
-                                      <input type="hidden" name="no" value="{{ todo.no }}"> 
-                                      <button type="submit" class="btn btn-outline-primary">
-                                        <i class="bi bi-arrow-up-square"></i>
-                                      </button>
-                                    </form>
-                                </td>
-                                <td class="text-start">
+                            <tr onclick="detail('{{ todo.no }}')" 
+                                style="cursor: pointer;">
+                                <td class="w-25">
                                     {{ todo.title }}
                                 </td>
+                                <td class="text-start w-75">
+                                    {{ todo.content }}
+                                </td>
                                 <td>
-                                    <form action="./delete" method="post">
-                                        {% csrf_token %}
-                                        <input type="hidden" name="no" value="{{ todo.no }}">
-                                        <button class="btn btn-danger">
-                                            <i class="bi bi-trash2"></i>
-                                        </button>
-                                    </form>
+                                    <div class="d-flex justify-content-center gap-2">
+                                        <form action="{% url 'todo:ing' %}" method="post">
+                                          {% csrf_token %} 
+                                          <input type="hidden" name="no" value="{{ todo.no }}"> 
+                                          <button type="submit" class="btn btn-primary">
+                                            <i class="bi bi-arrow-up-square"></i>
+                                          </button>
+                                        </form>
+                                        <form action="{% url 'todo:delete' todo.no %}" method="post">
+                                            {% csrf_token %}
+                                            <input type="hidden" name="todo_no" value="{{ todo.no }}">
+                                            <button class="btn btn-dark">
+                                                <i class="bi bi-trash2"></i>
+                                            </button>
+                                        </form>
+                                    </div>
                                 </td>
                             </tr>
                         {% empty %}
@@ -133,7 +161,11 @@
         
     </div>
 
-
+    <script>
+    function detail(no) {
+        location.href = `/read/${no}`;
+    }
+    </script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/js/bootstrap.bundle.min.js" integrity="sha384-j1CDi7MgGQ12Z7Qab0qlWQ/Qqz24Gc6BM0thvEMVjHnfYGF0rmFCozFSxQBxwHKO" crossorigin="anonymous"></script>
 </body>
 </html>
