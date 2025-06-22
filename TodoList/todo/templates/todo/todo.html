@@ -10,43 +10,48 @@
         input[type='checkbox'] {
             cursor: pointer;
         }
+        body {
+            background-color: #666;
+        }
     </style>
 </head>
 <body>
-    <div class="container">
+    <div class="container mt-5">
         <div class="row justify-content-center">
             <div class="col-12 col-md-10 col-lg-8">
                 <h1>할 일 목록</h1>
                 <hr>
                 <form action="{% url 'todo:todo' %}" method="post" class="row g-3">
                     {% csrf_token %}
-                    
                     <div class="col-md-6">
                         <label for="id_title" class="form-label">할 일 제목</label>
                         <input type="text" name="title" class="form-control {% if form.title.errors %}is-invalid{% endif %}" id="id_title"
                             value="{{ form.title.value|default_if_none:'' }}"
                             placeholder="할 일을 입력해주세요.">
-                        {% for error in form.title.errors %}
-                        <div class="invalid-feedback">{{ error }}</div>
-                        {% endfor %}
-                    </div>
-
-                    <div class="col-md-6">
+                            {% for error in form.title.errors %}
+                            <div class="invalid-feedback">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+                        <div class="col-md-6">
                         <label for="id_content" class="form-label">내용</label>
                         <input type="text" name="content" class="form-control {% if form.content.errors %}is-invalid{% endif %}" id="id_content"
                             value="{{ form.content.value|default_if_none:'' }}"
                             placeholder="내용을 입력해주세요.">
-                        {% for error in form.content.errors %}
-                        <div class="invalid-feedback">{{ error }}</div>
-                        {% endfor %}
+                            {% for error in form.content.errors %}
+                            <div class="invalid-feedback">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+                        <div class="col-12">
+                            <button type="submit" class="btn btn-primary">등록</button>
+                        </div>
+                    </form>
+                    <hr>
+                    <div class="d-flex gap-3">
+                        <h3>진행 목록 - </h3>
+                        <h3 class="text-info">진행중</h3>
+                        <h3>/</h3>
+                        <h3 class="text-success text-decoration-line-through">완료</h3>
                     </div>
-
-                    <div class="col-12">
-                        <button type="submit" class="btn btn-primary">등록</button>
-                    </div>
-                </form>
-                <hr>
-                <h3>진행 목록</h3>
                 <table class="table table-bordered text-center align-middle">
                     <thead>
                         <tr class="table-dark">
@@ -100,7 +105,7 @@
                             </tr>
                         {% empty %}
                             <tr>
-                                <td colspan="3" class="text-center text-muted">
+                                <td colspan="4" class="text-center text-muted">
                                     조회된 데이터가 없습니다.
                                 </td>
                             </tr>
