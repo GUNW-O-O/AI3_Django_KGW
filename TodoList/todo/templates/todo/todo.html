@@ -6,12 +6,14 @@
     <title>할 일 목록</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-4Q6Gf2aSP4eDXB8Miphtr37CMZZQ5oXLH2yaXMJ2w8e2ZtHTl7GptT4jmndRuHDT" crossorigin="anonymous">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+KR&display=swap" rel="stylesheet">
     <style>
         input[type='checkbox'] {
             cursor: pointer;
         }
         body {
             background-color: #666;
+            font-family: "IBM Plex Sans KR", sans-serif;
         }
     </style>
 </head>
@@ -69,13 +71,14 @@
                                 onclick="detail('{{ todo.no }}')" 
                                 style="cursor: pointer;">
                                 <td>
-                                    <form action="{% url 'todo:done' %}" method="post">
+                                    <form method="post">
                                         {% csrf_token %}
                                         <input type="hidden" name="no" value="{{ todo.no }}">
-                                        <input type="checkbox" class="form-check-input"
-                                                onchange="this.form.submit()"
-                                                {% if todo.status == 'DONE' %}checked{% endif %}
-                                                style="width: 30px; height: 30px;">
+                                        <input type="checkbox"
+                                            class="form-check-input"
+                                            onchange="submitWithAction(this)"
+                                            {% if todo.status == 'DONE' %}checked{% endif %}
+                                            style="width: 30px; height: 30px;">
                                     </form>
                                 </td>
                                 <td class="text-start w-25">
@@ -166,6 +169,18 @@
         
     </div>
 
+    
+    <script>
+    function submitWithAction(checkbox) {
+        const form = checkbox.form;
+        if (checkbox.checked) {
+            form.action = "{% url 'todo:done' %}";
+        } else {
+            form.action = "{% url 'todo:ing' %}";
+        }
+        form.submit();
+    }
+    </script>
     <script>
     function detail(no) {
         location.href = `/read/${no}`;

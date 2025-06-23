@@ -10,7 +10,7 @@ class TodoAdmin(admin.ModelAdmin):
     list_display = ('no', 'todo_title', 'todo_content', 'todo_status', 'todo_is_completed', 'todo_created_at', 'todo_updated_at')
     search_fields = ('title',)
     readonly_fields = ('created_at', 'updated_at')
-    actions = ('make_completed', 'delete_selected')
+    actions = ('make_ing','make_wait','make_completed', 'delete_selected')
 
     @admin.display(description='제목')
     def todo_title(self, obj):
@@ -38,7 +38,15 @@ class TodoAdmin(admin.ModelAdmin):
     
     @admin.action(description='선택 완료 처리')
     def make_completed(self, request, queryset):
-        queryset.update(is_completed=True)
+        queryset.update(is_completed=True, status='DONE')
+
+    @admin.action(description='선택 대기 처리')
+    def make_wait(self, request, queryset):
+        queryset.update(is_completed=False, status='WAIT')
+
+    @admin.action(description='선택 진행중 처리')
+    def make_ing(self, request, queryset):
+        queryset.update(is_completed=False, status='ING')
 
     @admin.action(description='선택 삭제 처리')
     def delete_selected(self, request, queryset):

@@ -69,6 +69,7 @@ def ing(request):
         todo = Todo.objects.get(no=no)
         # 할 일 상태 수정
         todo.status = 'ING'
+        todo.is_completed = False
         todo.save()
     except Todo.DoesNotExist:
         print('수정할 할 일이 없습니다.')
