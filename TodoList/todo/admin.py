@@ -38,7 +38,7 @@ class TodoAdmin(admin.ModelAdmin):
     
     @admin.action(description='선택 완료 처리')
     def make_completed(self, request, queryset):
-        queryset.update(is_completed=True)
+    queryset.update(status='DONE', is_completed=True)
 
     @admin.action(description='선택 삭제 처리')
     def delete_selected(self, request, queryset):
